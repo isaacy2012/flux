@@ -42,6 +42,13 @@ concept repeated_invocable = repeated_invocable_helper<Func, E, N>::value;
 
 } // namespace detail
 
+namespace detail {
+
+template<typename... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<typename... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
+} // namespace detail
+
 FLUX_EXPORT
 template <typename Seq, typename Func, typename Init>
 concept foldable =
