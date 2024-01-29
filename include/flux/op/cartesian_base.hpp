@@ -231,8 +231,16 @@ public:
         requires (CartesianKind == cartesian_kind::product
                   && (sized_sequence<Bases> && ...))
     {
-        return std::apply([](auto&... base) {
-            return (flux::size(base) * ...);
+        return std::apply(overloaded {
+            [] {
+                return 0;
+            },
+            [](auto& base) {
+                return flux::size(base);
+            },
+            [](auto& base1, auto& base2, auto&... rest) {
+                return num::variadic_checked_mul(flux::size(base1), flux::size(base2), flux::size(rest)...);
+            }
         }, self.bases_);
     }
 
