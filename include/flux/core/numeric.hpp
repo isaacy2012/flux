@@ -171,6 +171,30 @@ inline constexpr auto checked_mul =
   }
 };
 
+namespace detail {
+template<std::signed_integral... Ts>
+inline constexpr auto variadic_checked_mul_impl(Ts... ts);
+
+template<std::signed_integral T1, std::signed_integral T2>
+inline constexpr auto variadic_checked_mul_impl(T1 lhs, T2 rhs) {
+    return checked_mul(lhs, rhs);
+};
+
+template<std::signed_integral T1, std::signed_integral T2, std::signed_integral... Ts>
+inline constexpr auto variadic_checked_mul_impl(T1 lhs, T2 rhs, Ts... ts) {
+    return variadic_checked_mul_impl(
+        variadic_checked_mul_impl<T1, T2>(lhs, rhs), ts...);
+};
+
+}
+
+template<std::signed_integral T1, std::signed_integral T2, std::signed_integral... Ts>
+FLUX_EXPORT
+inline constexpr auto variadic_checked_mul(T1 lhs, T2 rhs, Ts... ts) {
+    return detail::variadic_checked_mul_impl(lhs, rhs, ts...);
+};
+
+
 FLUX_EXPORT
 inline constexpr auto checked_pow =
         []<std::signed_integral T, std::unsigned_integral U>(T base, U exponent,
